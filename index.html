@@ -12,7 +12,13 @@
     label { font-weight: bold; display: block; margin-bottom: 6px; color: #333; font-size: 14px; }
     input[type="text"] { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; }
     input[type="text"]:focus { border-color: #3498db; outline: none; }
+    
+    .input-group { display: flex; gap: 8px; }
     .btn { padding: 12px 14px; border: none; border-radius: 6px; cursor: pointer; color: white; font-weight: bold; font-size: 15px; }
+    .btn-scan { background-color: #f39c12; flex-shrink: 0; min-width: 95px; }
+    .btn-scan:hover { background-color: #e67e22; }
+    .btn-close { background-color: #e74c3c !important; }
+    
     .btn-submit { background-color: #27ae60; width: 100%; margin-top: 14px; font-size: 17px; }
     .btn-submit:hover { background-color: #219150; }
     .btn:active { opacity: 0.85; }
@@ -22,11 +28,11 @@
     .suggestion-item { padding: 11px; border-bottom: 1px solid #eee; cursor: pointer; font-size: 14px; }
     .suggestion-item:hover { background-color: #f1f2f6; }
     
-    /* Vùng Camera soi trực tiếp */
-    #reader-container { margin-bottom: 15px; }
+    /* Khung Camera: Mặc định ẩn, chỉ hiện khi bấm Quét */
+    #reader-container { display: none; margin-top: 12px; margin-bottom: 12px; }
     #reader { width: 100%; border-radius: 8px; overflow: hidden; background: #000; }
     
-    /* Tự động ngắt dòng chống tràn viền */
+    /* Tự động ngắt dòng chống tràn viền màn hình */
     #message { 
       margin-top: 14px; 
       font-weight: 500; 
@@ -48,14 +54,9 @@
 <body>
 
   <div class="container">
-    <h2 style="text-align: center; color: #2c3e50; margin: 0 0 14px 0; font-size: 20px;">Quét Seri Camera (Live)</h2>
+    <h2 style="text-align: center; color: #2c3e50; margin: 0 0 14px 0; font-size: 20px;">Quét Seri Camera</h2>
 
     <div id="loading">⏳ Đang tải dữ liệu từ Google Sheets...</div>
-
-    <!-- Khung Camera soi trực tiếp luôn bật sẵn -->
-    <div id="reader-container">
-      <div id="reader"></div>
-    </div>
 
     <form id="dataForm" onsubmit="return false;">
       <div class="form-group">
@@ -67,7 +68,15 @@
 
       <div class="form-group">
         <label>Mã Seri Camera:</label>
-        <input type="text" id="seriInput" placeholder="Lia camera vào mã để tự dính..." required>
+        <div class="input-group">
+          <input type="text" id="seriInput" placeholder="Nhập seri hoặc bấm quét mã" required>
+          <button type="button" class="btn btn-scan" id="scanBtn" onclick="toggleScanner()">📷 Quét</button>
+        </div>
+      </div>
+
+      <!-- Vùng hiển thị camera khi bấm nút Quét -->
+      <div id="reader-container">
+        <div id="reader"></div>
       </div>
 
       <button type="button" class="btn btn-submit" id="submitBtn" onclick="submitData()">Gửi dữ liệu</button>
@@ -76,14 +85,13 @@
   </div>
 
   <script>
-    // 👉 THAY LINK WEB APP GOOGLE APPS SCRIPT CỦA BẠN VÀO ĐÂY:
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwF9JM6igBvGtO0NE-NpCeMeVRR6qnXLhfS2p8gbGG1KM6zTmiTp7sqtSlpcxLqrjzrlQ/exec";
 
     let driverData = [];
     let html5QrCode = null;
 
     window.onload = function() {
-      // 1. Tải danh sách xe từ Google Sheet
+      // Tải danh sách xe từ Google Sheet
       fetch(`${SCRIPT_URL}?action=getDrivers`)
         .then(res => res.json())
         .then(data => {
@@ -95,31 +103,63 @@
           document.getElementById('loading').style.display = 'none';
           showMessage("Lỗi kết nối Sheet: Hãy kiểm tra quyền Web App!", "error");
         });
-
-      // 2. Tự động bật camera soi trực tiếp luôn
-      startLiveCamera();
     };
 
-    function startLiveCamera() {
-      html5QrCode = new Html5Qrcode("reader");
-      html5QrCode.start(
-        { facingMode: "environment" },
-        {
-          fps: 15,
-          qrbox: function(w, h) {
-            return { width: Math.floor(w * 0.85), height: Math.floor(h * 0.6) };
-          }
-        },
-        (decodedText) => {
-          // QUÉT TRÚNG LÀ TỰ DÍNH MÃ NGAY LẬP TỨC (LẤY NGUYÊN 100%)
-          document.getElementById('seriInput').value = decodedText.trim();
-          if (navigator.vibrate) navigator.vibrate(100); // Rung nhẹ báo hiệu
-          showMessage('✅ Đã dính mã: ' + decodedText.trim(), 'success');
-        },
-        (errorMessage) => {}
-      ).catch(err => {
-        showMessage('⚠️ Không thể bật camera: Vui lòng bấm Cho phép (Allow) quyền camera trên trình duyệt.', 'error');
-      });
+    // Hàm Bật / Tắt camera khi bấm nút
+    async function toggleScanner() {
+      const readerContainer = document.getElementById('reader-container');
+      const scanBtn = document.getElementById('scanBtn');
+
+      if (!html5QrCode) {
+        html5QrCode = new Html5Qrcode("reader");
+      }
+
+      // Nếu đang mở camera thì bấm để tắt
+      if (html5QrCode.isScanning) {
+        await html5QrCode.stop();
+        readerContainer.style.display = 'none';
+        scanBtn.textContent = '📷 Quét';
+        scanBtn.classList.remove('btn-close');
+        return;
+      }
+
+      // Mở camera
+      readerContainer.style.display = 'block';
+      scanBtn.textContent = '❌ Đóng';
+      scanBtn.classList.add('btn-close');
+      showMessage('👀 Đang bật camera, lia máy qua mã để tự dính...', 'info');
+
+      try {
+        await html5QrCode.start(
+          { facingMode: "environment" },
+          {
+            fps: 15,
+            qrbox: function(w, h) {
+              return { width: Math.floor(w * 0.85), height: Math.floor(h * 0.6) };
+            }
+          },
+          (decodedText) => {
+            // TỰ ĐỘNG DÍNH MÃ - LẤY NGUYÊN 100% CHUỖI
+            document.getElementById('seriInput').value = decodedText.trim();
+            if (navigator.vibrate) navigator.vibrate(100);
+            showMessage('✅ Đã dính mã: ' + decodedText.trim(), 'success');
+
+            // Tự động tắt camera và ẩn khung sau khi đã quét thành công
+            html5QrCode.stop().then(() => {
+              readerContainer.style.display = 'none';
+              scanBtn.textContent = '📷 Quét';
+              scanBtn.classList.remove('btn-close');
+            });
+          },
+          (errorMessage) => {}
+        );
+      } catch (err) {
+        console.error(err);
+        readerContainer.style.display = 'none';
+        scanBtn.textContent = '📷 Quét';
+        scanBtn.classList.remove('btn-close');
+        showMessage('⚠️ Không thể bật camera: Vui lòng cho phép quyền Camera trên trình duyệt!', 'error');
+      }
     }
 
     const searchInput = document.getElementById('searchInput');
@@ -163,13 +203,12 @@
       msgDiv.className = type;
     }
 
-    // Gửi dữ liệu về Google Sheets
     async function submitData() {
       const row = document.getElementById('selectedRow').value;
       const seri = document.getElementById('seriInput').value.trim();
 
       if (!row) {
-        showMessage("Vui lòng chọn biển số từ gợi ý!", "error");
+        showMessage("Vui lòng chọn biển số từ danh sách gợi ý!", "error");
         return;
       }
       if (seri === '') {
