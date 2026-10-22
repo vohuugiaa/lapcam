@@ -222,7 +222,7 @@
         })
         .catch(err => {
           document.getElementById('loading').style.display = 'none';
-          showMessage("Lỗi kết nối Sheet: Vui lòng kiểm tra quyền Web App!", "error");
+          showMessage("Lỗi kết nối", "error");
         });
     };
 
@@ -282,7 +282,7 @@
       if (!currentDriver) return;
 
       const noticeText = 
-`🚨 LỆNH ĐIỀU ĐỘNG VỀ DÁN TEM & LẮP CAMERA 🚨
+`🚨 LỆNH ĐIỀU ĐỘNG & LẮP CAMERA 🚨
 
 👤 Tài xế: ${currentDriver.taiXe}
 🚘 Biển số xe: ${currentDriver.bienSo}
@@ -392,7 +392,7 @@
         return;
       }
 
-      showMessage("⏳ Đang lưu vào Google Sheets...", "info");
+      showMessage("⏳ Đang lưu dữ liệu...", "info");
       document.getElementById('submitBtn').disabled = true;
 
       try {
