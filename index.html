@@ -132,9 +132,9 @@
 <body>
 
   <div class="container">
-    <div class="page-title">🚨 ĐIỀU ĐỘNG DÁN TEM & LẮP CAM</div>
+    <div class="page-title">🚨 LỆNH ĐIỀU ĐỘNG & LẮP CAM</div>
 
-    <div id="loading">⏳ Đang tải dữ liệu từ Google Sheets...</div>
+    <div id="loading">⏳ Đang tải dữ liệu ...</div>
 
     <!-- Tìm kiếm nhân viên / xe -->
     <div class="form-group">
@@ -147,7 +147,7 @@
     <!-- BẢNG LỆNH ĐIỀU ĐỘNG HIỆN LÊN SAU KHI CHỌN XE -->
     <div id="noticeCard" class="notice-card">
       <div class="notice-header">
-        LỆNH ĐIỀU ĐỘNG VỀ DÁN TEM & LẮP CAMERA
+        LỆNH ĐIỀU ĐỘNG  & LẮP CAMERA
       </div>
       <div class="notice-body">
         <div class="info-row">
@@ -182,7 +182,7 @@
 
         <!-- Nút lưu vào bộ nhớ tạm gửi Zalo -->
         <button type="button" class="btn btn-copy" onclick="copyNoticeToClipboard()">
-          📋 Sao chép thông báo gửi Zalo cho Tài xế
+          📋 Sao chép thông báo
         </button>
         <div id="copySuccessMsg" class="copy-success"></div>
       </div>
@@ -190,7 +190,7 @@
 
     <!-- KHU VỰC CẬP NHẬT SERI (CÓ THỂ CẬP NHẬT SAU) -->
     <div class="seri-section">
-      <label>📷 Cập nhật Số Seri Cam (Cột E):</label>
+      <label>📷 Cập nhật Số Seri Cam :</label>
       <div class="input-group">
         <input type="text" id="seriInput" placeholder="Nhập seri hoặc bấm quét mã...">
         <button type="button" class="btn btn-scan" id="scanBtn" onclick="toggleScanner()">📷 Quét</button>
@@ -200,7 +200,7 @@
         <div id="reader"></div>
       </div>
 
-      <button type="button" class="btn btn-submit" id="submitBtn" onclick="submitData()">💾 Lưu mã Seri vào Google Sheet</button>
+      <button type="button" class="btn btn-submit" id="submitBtn" onclick="submitData()">💾 Lưu mã Seri </button>
       <div id="message"></div>
     </div>
   </div>
