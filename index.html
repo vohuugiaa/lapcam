@@ -3,47 +3,125 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
-  <title>Quét Seri Camera</title>
+  <title>Lệnh Điều Động & Cập Nhật Seri Camera</title>
   <style>
     * { box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; padding: 12px; background-color: #f4f7f6; margin: 0; }
-    .container { max-width: 480px; width: 100%; margin: 0 auto; background: #fff; padding: 18px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; padding: 12px; background-color: #f0f2f5; margin: 0; }
+    .container { max-width: 500px; width: 100%; margin: 0 auto; background: #fff; padding: 16px; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+    
+    .page-title { text-align: center; color: #b71540; margin: 0 0 14px 0; font-size: 19px; font-weight: 800; text-transform: uppercase; }
+    
     .form-group { margin-bottom: 14px; position: relative; }
-    label { font-weight: bold; display: block; margin-bottom: 6px; color: #333; font-size: 14px; }
-    input[type="text"] { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; }
-    input[type="text"]:focus { border-color: #3498db; outline: none; }
+    label { font-weight: bold; display: block; margin-bottom: 6px; color: #2d3436; font-size: 14px; }
+    input[type="text"] { width: 100%; padding: 12px; border: 1.5px solid #b2bec3; border-radius: 6px; font-size: 15px; }
+    input[type="text"]:focus { border-color: #d63031; outline: none; }
     
-    .input-group { display: flex; gap: 8px; }
-    .btn { padding: 12px 14px; border: none; border-radius: 6px; cursor: pointer; color: white; font-weight: bold; font-size: 15px; }
-    .btn-scan { background-color: #f39c12; flex-shrink: 0; min-width: 95px; }
-    .btn-scan:hover { background-color: #e67e22; }
-    .btn-close { background-color: #e74c3c !important; }
-    
-    .btn-submit { background-color: #27ae60; width: 100%; margin-top: 14px; font-size: 17px; }
-    .btn-submit:hover { background-color: #219150; }
-    .btn:active { opacity: 0.85; }
-    .btn:disabled { background-color: #bdc3c7; cursor: not-allowed; }
-    
-    #suggestions { border: 1px solid #ccc; border-top: none; max-height: 180px; overflow-y: auto; position: absolute; width: 100%; background: white; z-index: 1000; border-radius: 0 0 6px 6px; display: none; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    #suggestions { border: 1px solid #ccc; border-top: none; max-height: 220px; overflow-y: auto; position: absolute; width: 100%; background: white; z-index: 1000; border-radius: 0 0 6px 6px; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
     .suggestion-item { padding: 11px; border-bottom: 1px solid #eee; cursor: pointer; font-size: 14px; }
-    .suggestion-item:hover { background-color: #f1f2f6; }
+    .suggestion-item:hover { background-color: #ffeaa7; }
+    .suggestion-item b { color: #d63031; }
+
+    /* BẢNG LỆNH ĐIỀU ĐỘNG NGHIÊM KHẮC */
+    .notice-card {
+      display: none;
+      background: #fff;
+      border: 2px solid #d63031;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 16px;
+      box-shadow: 0 3px 8px rgba(214, 48, 49, 0.2);
+    }
+    .notice-header {
+      background: #d63031;
+      color: white;
+      padding: 10px;
+      font-weight: 800;
+      text-align: center;
+      font-size: 15px;
+      letter-spacing: 0.5px;
+    }
+    .notice-body { padding: 14px; }
+    .info-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px dashed #dfe6e9; font-size: 14px; }
+    .info-label { color: #636e72; font-weight: 600; }
+    .info-val { font-weight: bold; color: #2d3436; text-align: right; }
     
-    /* Khung Camera: Mặc định ẩn, chỉ hiện khi bấm Quét */
-    #reader-container { display: none; margin-top: 12px; margin-bottom: 12px; }
-    #reader { width: 100%; border-radius: 8px; overflow: hidden; background: #000; }
-    
-    /* Tự động ngắt dòng chống tràn viền màn hình */
-    #message { 
-      margin-top: 14px; 
-      font-weight: 500; 
-      text-align: center; 
-      font-size: 14px; 
-      line-height: 1.5;
-      word-break: break-all; 
-      overflow-wrap: anywhere; 
+    .highlight-time-box {
+      background: #ffebee;
+      border-left: 5px solid #d63031;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+    }
+    .highlight-time {
+      color: #c0392b;
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .map-btn {
+      display: inline-block;
+      background: #0984e3;
+      color: white;
+      text-decoration: none;
+      padding: 7px 12px;
+      border-radius: 5px;
+      font-weight: bold;
+      font-size: 13px;
+      margin-top: 4px;
+    }
+    .map-btn:hover { background: #0767b1; }
+
+    .warning-box {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeeba;
       padding: 10px;
       border-radius: 6px;
+      font-size: 13px;
+      line-height: 1.5;
+      margin-top: 10px;
     }
+    .warning-box b { color: #c0392b; }
+
+    .btn-copy {
+      background-color: #6c5ce7;
+      width: 100%;
+      margin-top: 12px;
+      padding: 12px;
+      font-size: 15px;
+    }
+    .btn-copy:hover { background-color: #5641e5; }
+    
+    .copy-success {
+      display: none;
+      background: #00b894;
+      color: white;
+      text-align: center;
+      padding: 8px;
+      border-radius: 5px;
+      font-size: 13px;
+      font-weight: bold;
+      margin-top: 8px;
+    }
+
+    /* KHUNG NHẬP SERI & CAMERA */
+    .seri-section {
+      background: #f8f9fa;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #e9ecef;
+    }
+    .input-group { display: flex; gap: 8px; }
+    .btn { border: none; border-radius: 6px; cursor: pointer; color: white; font-weight: bold; }
+    .btn-scan { background-color: #f39c12; flex-shrink: 0; min-width: 90px; padding: 10px 14px; font-size: 14px; }
+    .btn-close { background-color: #e74c3c !important; }
+    .btn-submit { background-color: #27ae60; width: 100%; margin-top: 12px; padding: 12px; font-size: 16px; }
+    .btn-submit:hover { background-color: #219150; }
+
+    #reader-container { display: none; margin-top: 12px; }
+    #reader { width: 100%; border-radius: 8px; overflow: hidden; background: #000; }
+
+    #message { margin-top: 12px; font-weight: 500; text-align: center; font-size: 14px; word-break: break-all; padding: 8px; border-radius: 6px; }
     .success { color: #1e824c; background-color: #eafaf1; }
     .error { color: #c0392b; background-color: #fdedec; }
     .info { color: #2980b9; background-color: #ebf5fb; }
@@ -54,44 +132,87 @@
 <body>
 
   <div class="container">
-    <h2 style="text-align: center; color: #2c3e50; margin: 0 0 14px 0; font-size: 20px;">Quét Seri Camera</h2>
+    <div class="page-title">🚨 ĐIỀU ĐỘNG DÁN TEM & LẮP CAM</div>
 
     <div id="loading">⏳ Đang tải dữ liệu từ Google Sheets...</div>
 
-    <form id="dataForm" onsubmit="return false;">
-      <div class="form-group">
-        <label>Tìm kiếm (Biển số hoặc Tên):</label>
-        <input type="text" id="searchInput" placeholder="Nhập để tìm..." autocomplete="off" disabled>
-        <div id="suggestions"></div>
-        <input type="hidden" id="selectedRow">
-      </div>
+    <!-- Tìm kiếm nhân viên / xe -->
+    <div class="form-group">
+      <label>🔍 Tìm kiếm Biển số xe hoặc Tên tài xế:</label>
+      <input type="text" id="searchInput" placeholder="Gõ biển số hoặc tên tài xế để tra cứu..." autocomplete="off" disabled>
+      <div id="suggestions"></div>
+      <input type="hidden" id="selectedRow">
+    </div>
 
-      <div class="form-group">
-        <label>Mã Seri Camera:</label>
-        <div class="input-group">
-          <input type="text" id="seriInput" placeholder="Nhập seri hoặc bấm quét mã" required>
-          <button type="button" class="btn btn-scan" id="scanBtn" onclick="toggleScanner()">📷 Quét</button>
+    <!-- BẢNG LỆNH ĐIỀU ĐỘNG HIỆN LÊN SAU KHI CHỌN XE -->
+    <div id="noticeCard" class="notice-card">
+      <div class="notice-header">
+        LỆNH ĐIỀU ĐỘNG VỀ DÁN TEM & LẮP CAMERA
+      </div>
+      <div class="notice-body">
+        <div class="info-row">
+          <span class="info-label">👤 Tài xế:</span>
+          <span class="info-val" id="noticeTaiXe">---</span>
         </div>
+        <div class="info-row">
+          <span class="info-label">🚘 Biển số xe:</span>
+          <span class="info-val" id="noticeBienSo" style="color:#d63031; font-size:16px;">---</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">📅 Ngày thực hiện:</span>
+          <span class="info-val" style="color:#d63031;">23/10/2026 (1 ngày duy nhất)</span>
+        </div>
+
+        <div class="highlight-time-box">
+          <div style="font-size: 13px; font-weight: 600; color: #555;">⏰ KHUNG GIỜ BẮT BUỘC XE PHẢI VỀ:</div>
+          <div class="highlight-time" id="noticeKhungGio">00:00 - 00:00</div>
+        </div>
+
+        <div class="info-row" style="border: none; flex-direction: column; align-items: flex-start;">
+          <span class="info-label">📍 Địa chỉ tập trung (Ghim vị trí):</span>
+          <a href="https://maps.app.goo.gl/wHwdFQBYKph1E7A3A" target="_blank" class="map-btn">
+            🗺️ Bấm mở Google Maps dẫn đường
+          </a>
+        </div>
+
+        <div class="warning-box">
+          ⚠️ <b>LƯU Ý BẮT BUỘC CỦA ĐỘI:</b><br>
+          Đây là <b>lệnh điều động bắt buộc</b> của đội. Đội kỹ thuật đã lên kế hoạch để lắp camera chỉ trong <b>1 ngày duy nhất</b>. Xe nào không về trong khung giờ trên, đội sẽ tiến hành <b>LẬP BIÊN BẢN VÀ KHÓA APP THEO QUY ĐỊNH</b>.
+        </div>
+
+        <!-- Nút lưu vào bộ nhớ tạm gửi Zalo -->
+        <button type="button" class="btn btn-copy" onclick="copyNoticeToClipboard()">
+          📋 Sao chép thông báo gửi Zalo cho Tài xế
+        </button>
+        <div id="copySuccessMsg" class="copy-success"></div>
+      </div>
+    </div>
+
+    <!-- KHU VỰC CẬP NHẬT SERI (CÓ THỂ CẬP NHẬT SAU) -->
+    <div class="seri-section">
+      <label>📷 Cập nhật Số Seri Cam (Cột E):</label>
+      <div class="input-group">
+        <input type="text" id="seriInput" placeholder="Nhập seri hoặc bấm quét mã...">
+        <button type="button" class="btn btn-scan" id="scanBtn" onclick="toggleScanner()">📷 Quét</button>
       </div>
 
-      <!-- Vùng hiển thị camera khi bấm nút Quét -->
       <div id="reader-container">
         <div id="reader"></div>
       </div>
 
-      <button type="button" class="btn btn-submit" id="submitBtn" onclick="submitData()">Gửi dữ liệu</button>
+      <button type="button" class="btn btn-submit" id="submitBtn" onclick="submitData()">💾 Lưu mã Seri vào Google Sheet</button>
       <div id="message"></div>
-    </form>
+    </div>
   </div>
 
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwF9JM6igBvGtO0NE-NpCeMeVRR6qnXLhfS2p8gbGG1KM6zTmiTp7sqtSlpcxLqrjzrlQ/exec";
 
     let driverData = [];
+    let currentDriver = null;
     let html5QrCode = null;
 
     window.onload = function() {
-      // Tải danh sách xe từ Google Sheet
       fetch(`${SCRIPT_URL}?action=getDrivers`)
         .then(res => res.json())
         .then(data => {
@@ -101,66 +222,9 @@
         })
         .catch(err => {
           document.getElementById('loading').style.display = 'none';
-          showMessage("Lỗi kết nối Sheet: Hãy kiểm tra quyền Web App!", "error");
+          showMessage("Lỗi kết nối Sheet: Vui lòng kiểm tra quyền Web App!", "error");
         });
     };
-
-    // Hàm Bật / Tắt camera khi bấm nút
-    async function toggleScanner() {
-      const readerContainer = document.getElementById('reader-container');
-      const scanBtn = document.getElementById('scanBtn');
-
-      if (!html5QrCode) {
-        html5QrCode = new Html5Qrcode("reader");
-      }
-
-      // Nếu đang mở camera thì bấm để tắt
-      if (html5QrCode.isScanning) {
-        await html5QrCode.stop();
-        readerContainer.style.display = 'none';
-        scanBtn.textContent = '📷 Quét';
-        scanBtn.classList.remove('btn-close');
-        return;
-      }
-
-      // Mở camera
-      readerContainer.style.display = 'block';
-      scanBtn.textContent = '❌ Đóng';
-      scanBtn.classList.add('btn-close');
-      showMessage('👀 Đang bật camera, lia máy qua mã để tự dính...', 'info');
-
-      try {
-        await html5QrCode.start(
-          { facingMode: "environment" },
-          {
-            fps: 15,
-            qrbox: function(w, h) {
-              return { width: Math.floor(w * 0.85), height: Math.floor(h * 0.6) };
-            }
-          },
-          (decodedText) => {
-            // TỰ ĐỘNG DÍNH MÃ - LẤY NGUYÊN 100% CHUỖI
-            document.getElementById('seriInput').value = decodedText.trim();
-            if (navigator.vibrate) navigator.vibrate(100);
-            showMessage('✅ Đã dính mã: ' + decodedText.trim(), 'success');
-
-            // Tự động tắt camera và ẩn khung sau khi đã quét thành công
-            html5QrCode.stop().then(() => {
-              readerContainer.style.display = 'none';
-              scanBtn.textContent = '📷 Quét';
-              scanBtn.classList.remove('btn-close');
-            });
-          },
-          (errorMessage) => {}
-        );
-      } catch (err) {
-        console.error(err);
-        readerContainer.style.display = 'none';
-        scanBtn.textContent = '📷 Quét';
-        scanBtn.classList.remove('btn-close');
-        showMessage('⚠️ Không thể bật camera: Vui lòng cho phép quyền Camera trên trình duyệt!', 'error');
-      }
-    }
 
     const searchInput = document.getElementById('searchInput');
     const suggestionsBox = document.getElementById('suggestions');
@@ -180,11 +244,9 @@
         filtered.forEach(item => {
           const div = document.createElement('div');
           div.className = 'suggestion-item';
-          div.textContent = `${item.bienSo} - ${item.taiXe}`;
+          div.innerHTML = `🚘 <b>${item.bienSo}</b> - ${item.taiXe} <span style="color:#d63031; font-weight:bold;">[${item.khungGio}]</span>`;
           div.onclick = function() {
-            searchInput.value = this.textContent;
-            document.getElementById('selectedRow').value = item.row;
-            suggestionsBox.style.display = 'none';
+            selectDriver(item);
           };
           suggestionsBox.appendChild(div);
         });
@@ -193,9 +255,122 @@
       }
     });
 
+    // Khi chọn tài xế
+    function selectDriver(item) {
+      currentDriver = item;
+      searchInput.value = `${item.bienSo} - ${item.taiXe}`;
+      document.getElementById('selectedRow').value = item.row;
+      document.getElementById('seriInput').value = item.seri || '';
+      suggestionsBox.style.display = 'none';
+
+      // Hiển thị bảng điều động với khung giờ chính xác
+      document.getElementById('noticeTaiXe').textContent = item.taiXe;
+      document.getElementById('noticeBienSo').textContent = item.bienSo;
+      document.getElementById('noticeKhungGio').textContent = item.khungGio || '08:00 - 09:00';
+      document.getElementById('noticeCard').style.display = 'block';
+
+      // Cuộn nhẹ xuống bảng điều động
+      document.getElementById('noticeCard').scrollIntoView({ behavior: 'smooth' });
+    }
+
     document.addEventListener('click', function(e) {
       if (e.target !== searchInput) suggestionsBox.style.display = 'none';
     });
+
+    // SAO CHÉP THÔNG BÁO VÀO BỘ NHỚ TẠM (CLIPBOARD)
+    function copyNoticeToClipboard() {
+      if (!currentDriver) return;
+
+      const noticeText = 
+`🚨 LỆNH ĐIỀU ĐỘNG VỀ DÁN TEM & LẮP CAMERA 🚨
+
+👤 Tài xế: ${currentDriver.taiXe}
+🚘 Biển số xe: ${currentDriver.bienSo}
+📅 Ngày thực hiện: 23/10/2026 (Chỉ 1 ngày duy nhất)
+⏰ KHUNG GIỜ BẮT BUỘC CÓ MẶT: ${currentDriver.khungGio}
+📍 Vị trí tập trung (Google Maps): https://maps.app.goo.gl/wHwdFQBYKph1E7A3A
+
+⚠️ LƯU Ý BẮT BUỘC TỪ ĐỘI:
+Đây là lệnh điều động của đội. Đội kỹ thuật đã lên kế hoạch để lắp camera chỉ trong 1 ngày duy nhất. Xe nào không về trong khung giờ trên, đội sẽ tiến hành LẬP BIÊN BẢN VÀ KHÓA APP THEO QUY ĐỊNH.
+
+👉 Yêu cầu tài xế sắp xếp lộ trình và có mặt đúng giờ!`;
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(noticeText).then(showCopySuccess);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = noticeText;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+          document.execCommand('copy');
+          showCopySuccess();
+        } catch (err) {
+          alert("Không thể sao chép tự động!");
+        }
+        textArea.remove();
+      }
+    }
+
+    function showCopySuccess() {
+      const msg = document.getElementById('copySuccessMsg');
+      msg.textContent = "✅ ĐÃ LƯU VÀO BỘ NHỚ TẠM! Hãy mở Zalo và Dán (Paste) gửi tài xế ngay.";
+      msg.style.display = "block";
+      if (navigator.vibrate) navigator.vibrate(80);
+      setTimeout(() => { msg.style.display = "none"; }, 4000);
+    }
+
+    // BẬT / TẮT CAMERA QUÉT SERI
+    async function toggleScanner() {
+      const readerContainer = document.getElementById('reader-container');
+      const scanBtn = document.getElementById('scanBtn');
+
+      if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
+
+      if (html5QrCode.isScanning) {
+        await html5QrCode.stop();
+        readerContainer.style.display = 'none';
+        scanBtn.textContent = '📷 Quét';
+        scanBtn.classList.remove('btn-close');
+        return;
+      }
+
+      readerContainer.style.display = 'block';
+      scanBtn.textContent = '❌ Đóng';
+      scanBtn.classList.add('btn-close');
+
+      try {
+        await html5QrCode.start(
+          { facingMode: "environment" },
+          {
+            fps: 15,
+            qrbox: function(w, h) {
+              return { width: Math.floor(w * 0.85), height: Math.floor(h * 0.6) };
+            }
+          },
+          (decodedText) => {
+            document.getElementById('seriInput').value = decodedText.trim();
+            if (navigator.vibrate) navigator.vibrate(100);
+            showMessage('✅ Đã nhận diện Seri: ' + decodedText.trim(), 'success');
+
+            html5QrCode.stop().then(() => {
+              readerContainer.style.display = 'none';
+              scanBtn.textContent = '📷 Quét';
+              scanBtn.classList.remove('btn-close');
+            });
+          },
+          (errorMessage) => {}
+        );
+      } catch (err) {
+        readerContainer.style.display = 'none';
+        scanBtn.textContent = '📷 Quét';
+        scanBtn.classList.remove('btn-close');
+        showMessage('⚠️ Lỗi camera: Hãy kiểm tra quyền truy cập camera!', 'error');
+      }
+    }
 
     function showMessage(text, type) {
       const msgDiv = document.getElementById('message');
@@ -203,16 +378,17 @@
       msgDiv.className = type;
     }
 
+    // LƯU SERI VÀO CỘT E TRONG SHEET
     async function submitData() {
       const row = document.getElementById('selectedRow').value;
       const seri = document.getElementById('seriInput').value.trim();
 
       if (!row) {
-        showMessage("Vui lòng chọn biển số từ danh sách gợi ý!", "error");
+        showMessage("Vui lòng tìm và chọn biển số/tài xế trước!", "error");
         return;
       }
       if (seri === '') {
-        showMessage("Vui lòng quét hoặc nhập mã Seri!", "error");
+        showMessage("Vui lòng quét hoặc nhập mã Seri trước khi lưu!", "error");
         return;
       }
 
@@ -229,11 +405,6 @@
         
         document.getElementById('submitBtn').disabled = false;
         showMessage(res.message, res.success ? "success" : "error");
-        if(res.success) {
-          document.getElementById('searchInput').value = '';
-          document.getElementById('selectedRow').value = '';
-          document.getElementById('seriInput').value = '';
-        }
       } catch (err) {
         document.getElementById('submitBtn').disabled = false;
         showMessage("Lỗi gửi dữ liệu: " + err.message, "error");
